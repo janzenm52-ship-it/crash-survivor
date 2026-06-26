@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Überlebe ich den Flugzeugabsturz?</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --sky:#b8e4ff;--cloud:#fff;--grass:#5cb85c;
+      --card:#fff;--border:#e0e0e0;--text:#2d2d2d;--muted:#777;
+      --orange:#ff6b35;--red:#e74c3c;--green:#27ae60;--yellow:#f1c40f;
+      --purple:#8e44ad;--blue:#2980b9;
+      --radius:18px;--shadow:0 4px 20px rgba(0,0,0,.12);
+    }
+    body{background:var(--sky);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;padding-bottom:80px}
+    h1,h2,.fun-title{font-family:'Fredoka One',sans-serif}
+
+    /* ── Cookie Banner ── */
+    #cookieBanner{
+      position:fixed;bottom:0;left:0;right:0;z-index:999;
+      background:#2d2d2d;color:#fff;padding:14px 20px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+      font-size:.85rem;
+    }
+    #cookieBanner a{color:#ffd166;text-decoration:underline}
+    #cookieBanner button{
+      background:var(--orange);color:#fff;border:none;padding:8px 18px;
+      border-radius:20px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap
+    }
+
+    /* ── Header ── */
+    .hero{
+      background:linear-gradient(180deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%);
+      color:#fff;text-align:center;padding:40px 16px 0;
+      position:relative;overflow:hidden;min-height:240px;
+    }
+    .hero h1{font-size:clamp(1.4rem,4vw,2.2rem);letter-spacing:.5px;text-shadow:2px 2px 8px rgba(0,0,0,.5)}
+    .hero p{opacity:.8;margin-top:8px;font-size:.95rem}
+    .stars{position:absolute;top:0;left:0;right:0;height:100%;pointer-events:none}
+    .star{position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;animation:twinkle 2s infinite alternate}
+    @keyframes twinkle{from{opacity:.2}to{opacity:1}}
+
+    /* Crashing plane SVG area */
+    .plane-scene{position:relative;height:120px;margin-top:16px}
+    .crash-plane{
+      position:absolute;font-size:3rem;
+      animation:crash 3s ease-in-out infinite;
+      filter:drop-shadow(0 0 8px rgba(255,100,0,.6));
+    }
+    @keyframes crash{
+      0%{left:5%;top:20px;transform:rotate(-15deg)}
+      50%{left:45%;top:60px;transform:rotate(25deg)}
+      80%{left:70%;top:80px;transform:rotate(45deg)}
+      100%{left:5%;top:20px;transform:rotate(-15deg)}
+    }
+    .explosion{
+      position:absolute;font-size:2.5rem;
+      animation:boom 3s ease-in-out infinite;
+      opacity:0;
+    }
+    @keyframes boom{
+      0%,65%{opacity:0;transform:scale(.5)}
+      80%{opacity:1;transform:scale(1.3)}
+      100%{opacity:0;transform:scale(.5)}
+    }
+
+    /* ── Wrap ── */
+    .wrap{max-width:680px;margin:0 auto;padding:24px 14px 0}
+
+    /* ── Cards ── */
+    .card{
+      background:var(--card);border:3px solid #222;border-radius:var(--radius);
+      box-shadow:5px 5px 0 #222;padding:22px;margin-bottom:18px;
+    }
+    .card-title{
+      font-family:'Fredoka One',sans-serif;font-size:1.1rem;
+      margin-bottom:16px;display:flex;align-items:center;gap:8px;
+      color:#222;
+    }
+
+    /* ── Aircraft grid ── */
+    .aircraft-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+    .ac-card{
+      border:3px solid #ddd;border-radius:14px;padding:12px 8px;text-align:center;
+      cursor:pointer;transition:all .15s;background:#fafafa;
+    }
+    .ac-card:hover{border-color:var(--orange);transform:translateY(-2px)}
+    .ac-card.active{border-color:var(--orange);background:#fff7f3;box-shadow:3px 3px 0 var(--orange)}
+    .ac-icon{font-size:1.8rem;display:block;margin-bottom:4px}
+    .ac-name{font-size:.78rem;font-weight:700;display:block;line-height:1.2}
+    .ac-ex{font-size:.65rem;color:var(--muted);display:block;margin-top:2px}
+
+    /* ── Seat selector ── */
+    .seat-visual{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:10px}
+    .plane-nose-css{
+      width:60px;height:30px;background:#ccc;border-radius:50% 50% 0 0 / 100% 100% 0 0;
+      border:3px solid #222;border-bottom:none;margin-bottom:-3px;
+    }
+    .seat-row-group{
+      display:flex;flex-direction:column;gap:3px;width:100%;max-width:280px;
+    }
+    .seat-btn{
+      border:3px solid #ddd;border-radius:10px;padding:8px 12px;cursor:pointer;
+      text-align:center;background:#f5f5f5;font-size:.82rem;font-weight:700;
+      transition:all .12s;display:flex;align-items:center;justify-content:space-between;
+    }
+    .seat-btn:hover{border-color:var(--blue)}
+    .seat-btn.active{border-color:var(--blue);background:#e8f4fd;box-shadow:2px 2px 0 var(--blue)}
+    .seat-safety{font-size:.7rem;padding:2px 7px;border-radius:8px;font-weight:700}
+    .safety-good{background:#d4edda;color:#155724}
+    .safety-mid{background:#fff3cd;color:#856404}
+    .safety-bad{background:#f8d7da;color:#721c24}
+    .plane-tail-css{
+      width:80px;height:20px;background:#ccc;border-radius:0 0 8px 8px;
+      border:3px solid #222;border-top:none;margin-top:-3px;
+    }
+
+    /* ── Fields ── */
+    .field{margin-bottom:14px}
+    .field:last-child{margin-bottom:0}
+    .field>label{display:block;font-size:.88rem;font-weight:700;margin-bottom:6px}
+    select,input[type=number]{
+      width:100%;padding:10px 12px;border:2px solid #ddd;border-radius:10px;
+      background:#fafafa;font-size:.9rem;color:var(--text);font-family:'Nunito',sans-serif;
+    }
+    select:focus,input[type=number]:focus{outline:none;border-color:var(--orange)}
+    select{appearance:none;cursor:pointer}
+
+    .slider-row{display:flex;align-items:center;gap:12px}
+    input[type=range]{flex:1;accent-color:var(--orange);cursor:pointer}
+    .slider-val{min-width:52px;text-align:right;font-weight:800;color:var(--orange)}
+
+    .alt-row{display:flex;gap:8px;align-items:center}
+    .alt-row input{flex:1}
+    .alt-auto-badge{
+      font-size:.75rem;font-weight:700;padding:4px 10px;border-radius:8px;
+      background:#e8f4fd;color:var(--blue);border:2px solid var(--blue);white-space:nowrap;cursor:pointer
+    }
+    .alt-auto-badge:hover{background:var(--blue);color:#fff}
+
+    /* ── Toggle ── */
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+    .toggle-row+.toggle-row{border-top:2px dashed #eee}
+    .toggle-label{font-size:.88rem;font-weight:700}
+    .toggle-label small{display:block;font-weight:400;color:var(--muted);font-size:.75rem}
+    .toggle{position:relative;width:46px;height:26px;flex-shrink:0}
+    .toggle input{opacity:0;width:0;height:0}
+    .tslider{
+      position:absolute;inset:0;background:#ccc;border-radius:26px;
+      cursor:pointer;transition:background .2s;border:2px solid #aaa;
+    }
+    .tslider::before{
+      content:'';position:absolute;width:18px;height:18px;border-radius:50%;
+      background:#fff;top:2px;left:2px;transition:transform .2s;
+      box-shadow:1px 1px 3px rgba(0,0,0,.3)
+    }
+    .toggle input:checked+.tslider{background:var(--orange);border-color:var(--orange)}
+    .toggle input:checked+.tslider::before{transform:translateX(20px)}
+
+    /* ── Terrain grid ── */
+    .terrain-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+    .terrain-btn{
+      border:3px solid #ddd;border-radius:12px;padding:10px 6px;
+      text-align:center;cursor:pointer;background:#fafafa;transition:all .12s;
+    }
+    .terrain-btn:hover{border-color:var(--green)}
+    .terrain-btn.active{border-color:var(--green);background:#f0fff4;box-shadow:2px 2px 0 var(--green)}
+    .terrain-icon{font-size:1.6rem;display:block;margin-bottom:3px}
+    .terrain-name{font-size:.72rem;font-weight:700}
+
+    /* ── Calc button ── */
+    .calc-btn{
+      width:100%;padding:16px;background:var(--orange);color:#fff;
+      border:4px solid #222;border-radius:var(--radius);
+      font-family:'Fredoka One',sans-serif;font-size:1.4rem;
+      cursor:pointer;box-shadow:5px 5px 0 #222;
+      transition:all .1s;display:flex;align-items:center;justify-content:center;gap:10px
+    }
+    .calc-btn:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 #222}
+    .calc-btn:active{transform:translate(2px,2px);box-shadow:3px 3px 0 #222}
+
+    /* ── Modal ── */
+    .modal-overlay{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);
+      z-index:500;align-items:center;justify-content:center;padding:12px;overflow-y:auto
+    }
+    .modal-overlay.open{display:flex}
+    .modal{
+      background:var(--sky);border:4px solid #222;border-radius:24px;
+      max-width:600px;width:100%;max-height:92vh;overflow-y:auto;
+      box-shadow:8px 8px 0 #222;animation:popIn .25s cubic-bezier(.34,1.56,.64,1)
+    }
+    @keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+    .modal-head{
+      padding:20px 20px 14px;border-bottom:3px solid #222;
+      background:#fff;border-radius:20px 20px 0 0;
+      display:flex;align-items:center;justify-content:space-between
+    }
+    .modal-head h2{font-family:'Fredoka One',sans-serif;font-size:1.3rem}
+    .close-x{
+      background:#222;color:#fff;border:none;width:34px;height:34px;
+      border-radius:50%;font-size:1rem;cursor:pointer;flex-shrink:0
+    }
+    .modal-body{padding:20px}
+
+    /* ── Scenario card ── */
+    .scenario-card{
+      background:#fff;border:3px solid #222;border-radius:16px;
+      padding:16px;margin-bottom:12px;box-shadow:4px 4px 0 #222;
+      display:flex;align-items:center;gap:14px;
+    }
+    .scenario-img{font-size:3rem;flex-shrink:0;text-align:center;width:56px}
+    .scenario-info{flex:1}
+    .scenario-label{font-family:'Fredoka One',sans-serif;font-size:1rem}
+    .scenario-bar-wrap{height:16px;background:#eee;border-radius:8px;border:2px solid #ccc;margin-top:6px;overflow:hidden}
+    .scenario-bar{height:100%;border-radius:6px;transition:width .7s cubic-bezier(.34,1.56,.64,1)}
+    .scenario-pct{font-size:.8rem;font-weight:800;margin-top:3px}
+    .verdict-box{
+      background:#fff;border:4px solid #222;border-radius:16px;
+      padding:18px;text-align:center;margin-bottom:16px;box-shadow:5px 5px 0 #222
+    }
+    .verdict-icon{font-size:4rem;display:block;margin-bottom:8px}
+    .verdict-text{font-family:'Fredoka One',sans-serif;font-size:1.5rem}
+    .verdict-sub{color:var(--muted);font-size:.88rem;margin-top:4px}
+
+    /* ── Recommendations ── */
+    .tip-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .tip{
+      background:#fff;border:2px solid #222;border-radius:12px;
+      padding:10px 12px;display:flex;gap:10px;align-items:flex-start;
+      font-size:.83rem;box-shadow:2px 2px 0 #222
+    }
+    .tip-icon{font-size:1.2rem;flex-shrink:0}
+    .tip b{display:block;font-size:.86rem}
+
+    /* ── Stranded man at bottom ── */
+    .beach-scene{
+      margin-top:40px;text-align:center;padding:10px 0 30px;
+      background:linear-gradient(180deg,var(--sky) 0%,#87CEEB 40%,#f5e6c8 70%,#c9a96e 100%);
+    }
+    .stranded-guy{font-size:1rem;line-height:1.3;display:inline-block;text-align:center}
+    .sun-char{font-size:2.5rem;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+    .info-status{font-size:.8rem;color:var(--muted);margin-top:8px;min-height:16px}
+    .info-status.ok{color:var(--green)}
+    .info-status.err{color:var(--red)}
+
+    footer{text-align:center;padding:16px;font-size:.75rem;color:#555}
+    footer a{color:var(--blue)}
+
+    @media(max-width:480px){
+      .aircraft-grid{grid-template-columns:repeat(3,1fr)}
+      .terrain-grid{grid-template-columns:repeat(3,1fr)}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Cookie Banner ── -->
+<div id="cookieBanner">
+  <span>🍪 Diese Seite verwendet <strong>keine Cookies</strong> und kein Tracking. Wir erfassen keine personenbezogenen Daten. <a href="impressum.html">Datenschutz & Impressum</a></span>
+  <button onclick="document.getElementById('cookieBanner').style.display='none';sessionStorage.setItem('cb','1')">Alles klar ✓</button>
+</div>
+<script>if(sessionStorage.getItem('cb'))document.getElementById('cookieBanner').style.display='none'</script>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="stars" id="starsContainer"></div>
+  <h1>✈️ Überlebe ich den Flugzeugabsturz?</h1>
+  <p>Dein persönlicher Crash-Überlebensorakel – wissenschaftlich* motiviert</p>
+  <div class="plane-scene">
+    <div class="crash-plane" id="crashPlane">✈️</div>
+    <div class="explosion" style="left:68%;top:65px">💥</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ── 1. Fahrzeugtyp ── -->
+  <div class="card">
+    <div class="card-title">🛩️ Luftfahrzeug-Typ</div>
+    <div class="aircraft-grid" id="aircraftGrid">
+      <div class="ac-card active" data-ac="medium-jet">
+        <span class="ac-icon">✈️</span>
+        <span class="ac-name">Linienjet</span>
+        <span class="ac-ex">Boeing 737, A320</span>
+      </div>
+      <div class="ac-card" data-ac="large-jet">
+        <span class="ac-icon">🛫</span>
+        <span class="ac-name">Großraumjet</span>
+        <span class="ac-ex">747, A380, A350</span>
+      </div>
+      <div class="ac-card" data-ac="regional">
+        <span class="ac-icon">🛩️</span>
+        <span class="ac-name">Regionaljet</span>
+        <span class="ac-ex">ATR 72, Dash 8</span>
+      </div>
+      <div class="ac-card" data-ac="small-plane">
+        <span class="ac-icon">🛩️</span>
+        <span class="ac-name">Kleinflugzeug</span>
+        <span class="ac-ex">Cessna, Piper</span>
+      </div>
+      <div class="ac-card" data-ac="helicopter">
+        <span class="ac-icon">🚁</span>
+        <span class="ac-name">Hubschrauber</span>
+        <span class="ac-ex">Bell, Sikorsky</span>
+      </div>
+      <div class="ac-card" data-ac="fighter">
+        <span class="ac-icon">🛦</span>
+        <span class="ac-name">Kampfjet</span>
+        <span class="ac-ex">F-16, Eurofighter</span>
+      </div>
+      <div class="ac-card" data-ac="glider">
+        <span class="ac-icon">🪁</span>
+        <span class="ac-name">Segelflugzeug</span>
+        <span class="ac-ex">ASK 21, Discus</span>
+      </div>
+      <div class="ac-card" data-ac="balloon">
+        <span class="ac-icon">🎈</span>
+        <span class="ac-name">Heißluftballon</span>
+        <span class="ac-ex">Cameron, Kubicek</span>
+      </div>
+      <div class="ac-card" data-ac="zeppelin">
+        <span class="ac-icon">🛸</span>
+        <span class="ac-name">Zeppelin</span>
+        <span class="ac-ex">NT, Goodyear</span>
+      </div>
+      <div class="ac-card" data-ac="ultralight">
+        <span class="ac-icon">🪂</span>
+        <span class="ac-name">Ultraleicht</span>
+        <span class="ac-ex">Trike, Drachen</span>
+      </div>
+      <div class="ac-card" data-ac="mil-heli">
+        <span class="ac-icon">🚁</span>
+        <span class="ac-name">Militär-Heli</span>
+        <span class="ac-ex">Apache, Black Hawk</span>
+      </div>
+      <div class="ac-card" data-ac="concorde">
+        <span class="ac-icon">🚀</span>
+        <span class="ac-name">Überschall</span>
+        <span class="ac-ex">Concorde, Tu-144</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Flughöhe ── -->
+  <div class="card">
+    <div class="card-title">📏 Flughöhe</div>
+    <div class="field">
+      <label>Flughöhe beim Absturz</label>
+      <div class="alt-row">
+        <input type="number" id="altInput" min="0" max="20000" value="10000" step="100"/>
+        <span style="font-weight:700">m</span>
+        <button class="alt-auto-badge" id="altAutoBtn">🔄 Auto</button>
+      </div>
+      <div class="info-status" id="altStatus">Typische Reiseflughöhe für diesen Flugzeugtyp.</div>
+    </div>
+    <div class="field">
+      <label>Flugphase</label>
+      <select id="flightPhase">
+        <option value="cruise">Reiseflug (Cruise)</option>
+        <option value="takeoff">Start / Steigflug</option>
+        <option value="landing">Landeanflug / Landung</option>
+        <option value="ground">Rollunfall am Boden</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── 3. Position & Sicherheitsgurt ── -->
+  <div class="card" id="seatCard">
+    <div class="card-title">💺 Position & Sicherung</div>
+    <div id="seatSection">
+      <div style="font-size:.82rem;font-weight:700;margin-bottom:8px">Sitzposition im Flugzeug:</div>
+      <div class="seat-visual">
+        <div class="plane-nose-css"></div>
+        <div class="seat-row-group" id="seatBtns"></div>
+        <div class="plane-tail-css"></div>
+      </div>
+    </div>
+    <div class="toggle-row" id="beltRow">
+      <div class="toggle-label">Angeschnallt<small>Sicherheitsgurt angelegt</small></div>
+      <label class="toggle"><input type="checkbox" id="beltToggle" checked/><span class="tslider"></span></label>
+    </div>
+    <div class="toggle-row" id="ejectRow" style="display:none">
+      <div class="toggle-label">Schleudersitz aktiviert<small>Nur bei Kampfjets relevant</small></div>
+      <label class="toggle"><input type="checkbox" id="ejectToggle"/><span class="tslider"></span></label>
+    </div>
+  </div>
+
+  <!-- ── 4. Untergrund ── -->
+  <div class="card">
+    <div class="card-title">🌍 Aufprall-Untergrund</div>
+    <div class="terrain-grid" id="terrainGrid">
+      <div class="terrain-btn active" data-terrain="runway"><span class="terrain-icon">🛤️</span><span class="terrain-name">Startbahn</span></div>
+      <div class="terrain-btn" data-terrain="flat-land"><span class="terrain-icon">🌾</span><span class="terrain-name">Flaches Land</span></div>
+      <div class="terrain-btn" data-terrain="forest"><span class="terrain-icon">🌲</span><span class="terrain-name">Wald</span></div>
+      <div class="terrain-btn" data-terrain="water-warm"><span class="terrain-icon">🌊</span><span class="terrain-name">Meer (warm)</span></div>
+      <div class="terrain-btn" data-terrain="water-cold"><span class="terrain-icon">🧊</span><span class="terrain-name">Meer (kalt)</span></div>
+      <div class="terrain-btn" data-terrain="mountain"><span class="terrain-icon">⛰️</span><span class="terrain-name">Gebirge</span></div>
+      <div class="terrain-btn" data-terrain="urban"><span class="terrain-icon">🏙️</span><span class="terrain-name">Stadt</span></div>
+      <div class="terrain-btn" data-terrain="desert"><span class="terrain-icon">🏜️</span><span class="terrain-name">Wüste</span></div>
+      <div class="terrain-btn" data-terrain="jungle"><span class="terrain-icon">🌴</span><span class="terrain-name">Dschungel</span></div>
+    </div>
+  </div>
+
+  <!-- ── 5. Persönliche Konstitution ── -->
+  <div class="card">
+    <div class="card-title">🧍 Deine Konstitution</div>
+    <div class="field">
+      <label>Alter</label>
+      <div class="slider-row">
+        <input type="range" id="ageSlider" min="1" max="90" value="30" step="1"/>
+        <span class="slider-val" id="ageVal">30 J.</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Körperliche Verfassung</label>
+      <select id="healthSelect">
+        <option value="athlete">🏃 Sportler / sehr fit</option>
+        <option value="good" selected>💪 Gut / gesund</option>
+        <option value="average">🙂 Durchschnittlich</option>
+        <option value="poor">😟 Eingeschränkt</option>
+        <option value="severe">🤒 Schwer krank / gebrechlich</option>
+      </select>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-label">Schwimmer / Kann schwimmen<small>Relevant bei Wasseraufprall</small></div>
+      <label class="toggle"><input type="checkbox" id="swimToggle" checked/><span class="tslider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-label">Notfalltraining absolviert<small>Sicherheitseinweisung, Crash-Training</small></div>
+      <label class="toggle"><input type="checkbox" id="trainToggle"/><span class="tslider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-label">Allein oder mit Begleitung<small>Gruppe kann Rettung beschleunigen</small></div>
+      <label class="toggle"><input type="checkbox" id="groupToggle"/><span class="tslider"></span></label>
+    </div>
+  </div>
+
+  <!-- ── Calc Button ── -->
+  <button class="calc-btn" id="calcBtn">💥 Meine Überlebenschance berechnen!</button>
+
+  <footer style="margin-top:16px">
+    <a href="impressum.html">📄 Impressum & Datenschutz</a><br/>
+    <small>* Basiert auf NTSB/FAA-Statistiken und Unfallforschung. Kein Ersatz für Sicherheitsberatung.</small>
+  </footer>
+
+</div><!-- /wrap -->
+
+<!-- ── Beach Scene ── -->
+<div class="beach-scene">
+  <div style="font-size:1.5rem;margin-bottom:4px">
+    <span class="sun-char">☀️</span>
+  </div>
+  <!-- Stranded man with red hair and sunburn (CSS art) -->
+  <div class="stranded-guy">
+    <!-- Head with red hair -->
+    <div style="position:relative;display:inline-block">
+      <div style="font-size:2.5rem;line-height:1">🏝️</div>
+      <div style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);white-space:nowrap">
+        <!-- The stranded guy -->
+        <div style="font-size:1.1rem;line-height:1.4;text-shadow:1px 1px 0 rgba(0,0,0,.2)">
+          <!-- Red hair + burned face -->
+          <div style="position:relative;display:inline-block">
+            <div style="font-size:2.2rem">🧑‍🦰</div>
+            <!-- Sunburn overlay -->
+            <div style="position:absolute;top:2px;left:50%;transform:translateX(-50%);font-size:1rem;opacity:.7">🔴</div>
+          </div>
+          <div style="font-size:.9rem;font-weight:800;color:#c0392b;text-shadow:none">ICH HAB ÜBERLEBT!</div>
+          <div style="font-size:.7rem;color:#e67e22;font-weight:700">...aber der Sonnenbrand ist brutal 🥵</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:2rem;margin-top:4px">🛻🌴✈️💥</div>
+    <div style="font-size:.75rem;color:#666;margin-top:6px;font-style:italic">
+      Irgendwo in der Wüste... Hauptsache der Flug war günstig.
+    </div>
+  </div>
+</div>
+
+<!-- ── Result Modal ── -->
+<div class="modal-overlay" id="resultOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>💥 Dein Crash-Report</h2>
+      <button class="close-x" id="closeModal">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const AIRCRAFT = {
+  'medium-jet':  {baseSurv:.84,defAlt:10000,hasSeat:true,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.7,landing:.6,ground:.4}},
+  'large-jet':   {baseSurv:.87,defAlt:10500,hasSeat:true,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.7,landing:.6,ground:.35}},
+  'regional':    {baseSurv:.79,defAlt:6500, hasSeat:true,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.75,landing:.65,ground:.45}},
+  'small-plane': {baseSurv:.63,defAlt:1200, hasSeat:false,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.85,landing:.8,ground:.6}},
+  'helicopter':  {baseSurv:.71,defAlt:400,  hasSeat:false,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.9,landing:.85,ground:.7}},
+  'fighter':     {baseSurv:.48,defAlt:9000, hasSeat:false,hasBelt:true,hasEject:true, phases:{cruise:1,takeoff:.8,landing:.75,ground:.6}},
+  'glider':      {baseSurv:.76,defAlt:1000, hasSeat:false,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.9,landing:.82,ground:.65}},
+  'balloon':     {baseSurv:.58,defAlt:700,  hasSeat:false,hasBelt:false,hasEject:false,phases:{cruise:1,takeoff:.9,landing:.75,ground:.85}},
+  'zeppelin':    {baseSurv:.61,defAlt:400,  hasSeat:true, hasBelt:false,hasEject:false,phases:{cruise:1,takeoff:.9,landing:.8,ground:.75}},
+  'ultralight':  {baseSurv:.57,defAlt:250,  hasSeat:false,hasBelt:false,hasEject:false,phases:{cruise:1,takeoff:.85,landing:.8,ground:.7}},
+  'mil-heli':    {baseSurv:.51,defAlt:500,  hasSeat:false,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.85,landing:.8,ground:.7}},
+  'concorde':    {baseSurv:.41,defAlt:18000,hasSeat:true, hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.6,landing:.55,ground:.4}},
+};
+
+const SEATS_COMMERCIAL = [
+  {id:'cockpit', label:'Cockpit / Crew', safety:'bad',  mod:.90, desc:'Erste Aufprallzone'},
+  {id:'front',   label:'Vordere Kabine (First/Business)', safety:'bad', mod:.88, desc:'Vorderes Drittel'},
+  {id:'feco',    label:'Vordere Economy', safety:'mid', mod:.93, desc:'Hinter First Class'},
+  {id:'wing',    label:'Notausgangsreihe (Tragfläche)', safety:'good', mod:1.18, desc:'Beste Evakuierungsposition'},
+  {id:'mid',     label:'Mittlere Kabine', safety:'mid', mod:1.00, desc:'Durchschnitt'},
+  {id:'rear',    label:'Hintere Kabine', safety:'good', mod:1.12, desc:'Statistisch sicherer'},
+  {id:'tail',    label:'Letzte Reihen (ganz hinten)', safety:'good', mod:1.20, desc:'Beste Überlebensrate'},
+];
+
+const SEATS_SMALL = [
+  {id:'pilot',   label:'Pilotensitz', safety:'bad',  mod:.85, desc:'Primärer Aufprall'},
+  {id:'copilot', label:'Co-Pilot / Beifahrer', safety:'bad', mod:.88, desc:'Vorne rechts'},
+  {id:'rear',    label:'Rücksitz / Passagier', safety:'good', mod:1.10, desc:'Hinten'},
+];
+
+const TERRAIN_MOD = {
+  'runway':     1.55,
+  'flat-land':  1.15,
+  'forest':     0.88,
+  'water-warm': 0.82,
+  'water-cold': 0.62,
+  'mountain':   0.58,
+  'urban':      0.72,
+  'desert':     0.85,
+  'jungle':     0.70,
+};
+
+const TERRAIN_MISSING = {
+  'runway':0.01,'flat-land':0.03,'forest':0.08,'water-warm':0.20,
+  'water-cold':0.30,'mountain':0.15,'urban':0.03,'desert':0.12,'jungle':0.18
+};
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let selectedAC    = 'medium-jet';
+let selectedSeat  = 'mid';
+let selectedTerrain = 'runway';
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+
+// Stars
+const sc = document.getElementById('starsContainer');
+for(let i=0;i<40;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*2}s`;
+  sc.appendChild(s);
+}
+
+// Age slider
+const ageSlider=document.getElementById('ageSlider');
+const ageVal=document.getElementById('ageVal');
+ageSlider.addEventListener('input',()=>ageVal.textContent=ageSlider.value+' J.');
+
+// Aircraft grid
+document.getElementById('aircraftGrid').addEventListener('click',e=>{
+  const card=e.target.closest('.ac-card');
+  if(!card)return;
+  document.querySelectorAll('.ac-card').forEach(c=>c.classList.remove('active'));
+  card.classList.add('active');
+  selectedAC=card.dataset.ac;
+  updateForAircraft();
+});
+
+// Terrain grid
+document.getElementById('terrainGrid').addEventListener('click',e=>{
+  const btn=e.target.closest('.terrain-btn');
+  if(!btn)return;
+  document.querySelectorAll('.terrain-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedTerrain=btn.dataset.terrain;
+});
+
+// Alt auto
+document.getElementById('altAutoBtn').addEventListener('click',()=>{
+  document.getElementById('altInput').value=AIRCRAFT[selectedAC].defAlt;
+  document.getElementById('altStatus').textContent='Automatische Höhe für diesen Flugzeugtyp gesetzt.';
+  document.getElementById('altStatus').className='info-status ok';
+});
+
+function updateForAircraft(){
+  const ac=AIRCRAFT[selectedAC];
+  // Auto altitude
+  document.getElementById('altInput').value=ac.defAlt;
+  document.getElementById('altStatus').textContent=`Typische Höhe: ${ac.defAlt.toLocaleString('de')} m`;
+
+  // Seat section
+  const seatSection=document.getElementById('seatSection');
+  const beltRow=document.getElementById('beltRow');
+  const ejectRow=document.getElementById('ejectRow');
+
+  if(ac.hasSeat){
+    seatSection.style.display='';
+    renderSeats(selectedAC==='medium-jet'||selectedAC==='large-jet'||selectedAC==='regional'||selectedAC==='zeppelin'||selectedAC==='concorde' ? 'commercial' : 'small');
+  } else if(['small-plane','helicopter','fighter','glider','balloon','ultralight','mil-heli'].includes(selectedAC)){
+    seatSection.style.display='';
+    renderSeats('small');
+  } else {
+    seatSection.style.display='none';
+  }
+
+  beltRow.style.display=ac.hasBelt?'':'none';
+  ejectRow.style.display=ac.hasEject?'':'none';
+}
+
+function renderSeats(type){
+  const seats=type==='commercial'?SEATS_COMMERCIAL:SEATS_SMALL;
+  const container=document.getElementById('seatBtns');
+  container.innerHTML='';
+  seats.forEach((s,i)=>{
+    const btn=document.createElement('div');
+    btn.className='seat-btn'+(i===0&&type!=='commercial'?' active':s.id==='mid'?' active':'');
+    if((type==='commercial'&&s.id==='mid')||(type!=='commercial'&&i===0))selectedSeat=s.id;
+    btn.dataset.sid=s.id;
+    btn.innerHTML=`<span>${s.label}</span><span class="seat-safety safety-${s.safety}">${s.safety==='good'?'✓ Sicher':s.safety==='mid'?'~ Mittel':'✗ Riskant'}</span>`;
+    btn.addEventListener('click',()=>{
+      container.querySelectorAll('.seat-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedSeat=s.id;
+    });
+    container.appendChild(btn);
+  });
+  selectedSeat=seats[0].id;
+}
+
+updateForAircraft();
+
+// ═══════════════════════════════════════════════
+// CALCULATION
+// ═══════════════════════════════════════════════
+document.getElementById('calcBtn').addEventListener('click',calculate);
+document.getElementById('closeModal').addEventListener('click',()=>document.getElementById('resultOverlay').classList.remove('open'));
+document.getElementById('resultOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open')});
+
+function calculate(){
+  const ac=AIRCRAFT[selectedAC];
+  const phase=document.getElementById('flightPhase').value;
+  const alt=parseInt(document.getElementById('altInput').value)||0;
+  const belt=document.getElementById('beltToggle').checked;
+  const eject=document.getElementById('ejectToggle').checked;
+  const age=parseInt(ageSlider.value);
+  const health=document.getElementById('healthSelect').value;
+  const swim=document.getElementById('swimToggle').checked;
+  const train=document.getElementById('trainToggle').checked;
+  const group=document.getElementById('groupToggle').checked;
+
+  // Base survival
+  let S=ac.baseSurv;
+
+  // Phase modifier
+  S*=ac.phases[phase]??1;
+
+  // Altitude: higher = worse in catastrophic crash, ground = better
+  const altFactor=alt<100?1.4:alt<500?1.2:alt<2000?1.05:alt<8000?1.0:alt<14000?0.95:0.88;
+  S*=altFactor;
+
+  // Seat
+  const seatList=[...SEATS_COMMERCIAL,...SEATS_SMALL];
+  const seat=seatList.find(s=>s.id===selectedSeat);
+  if(seat)S*=seat.mod;
+
+  // Belt
+  if(ac.hasBelt) S*=belt?1.28:0.68;
+
+  // Ejection seat (fighter)
+  if(ac.hasEject&&eject) S=Math.min(S*1.8,0.95);
+
+  // Terrain
+  S*=(TERRAIN_MOD[selectedTerrain]??1.0);
+
+  // Age
+  const ageMod=age<10?0.80:age<18?0.90:age<35?1.10:age<50?1.05:age<65?0.95:age<75?0.82:0.68;
+  S*=ageMod;
+
+  // Health
+  const healthMod={athlete:1.15,good:1.05,average:1.0,poor:0.88,severe:0.70}[health]??1.0;
+  S*=healthMod;
+
+  // Swim (water terrain)
+  if(selectedTerrain.startsWith('water')&&!swim) S*=0.72;
+
+  // Training
+  if(train) S*=1.10;
+
+  // Group
+  if(group) S*=1.06;
+
+  // Clamp
+  S=Math.max(0.01,Math.min(0.97,S));
+  const D=1-S; // death probability raw
+
+  // ── Distribute outcomes ──
+  const missingRate=TERRAIN_MISSING[selectedTerrain]??0.05;
+  const pMissing=Math.min(D*missingRate*1.8,0.20);
+  const pDisfigured=Math.min(D*0.12,0.12);
+  const pDead=Math.max(0,D-pMissing-pDisfigured);
+
+  // Survivor injuries depend on crash severity
+  const severity=D; // 0=safe, 1=lethal
+  const sevInjRate=0.25+severity*0.45;
+  const lightInjRate=Math.max(0.10,0.35-severity*0.15);
+  const uninjRate=Math.max(0.01,1-sevInjRate-lightInjRate);
+
+  const pSevere=S*sevInjRate;
+  const pLight=S*lightInjRate;
+  const pUninjured=S*uninjRate;
+
+  // Normalize all to 100%
+  const total=pDead+pMissing+pDisfigured+pSevere+pLight+pUninjured;
+  const norm=v=>Math.round((v/total)*1000)/10;
+
+  const results={
+    dead:      norm(pDead),
+    missing:   norm(pMissing),
+    disfigured:norm(pDisfigured),
+    severe:    norm(pSevere),
+    light:     norm(pLight),
+    uninjured: norm(pUninjured),
+  };
+
+  renderResults(results,S);
+}
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function renderResults(r,S){
+  // Dominant outcome
+  const dom=Object.entries(r).reduce((a,b)=>b[1]>a[1]?b:a);
+
+  const SCENARIOS={
+    uninjured: {label:'Unverletzt',      icon:'🏃',  img:'🦸 Du kommst raus wie ein Action-Held!', bar:'#27ae60'},
+    light:     {label:'Leicht verletzt', icon:'🤕',  img:'🩹 Kratzer und Beulen – wird schon!',    bar:'#f39c12'},
+    severe:    {label:'Schwer verletzt', icon:'🚑',  img:'🏥 Intensivstation, aber du lebst!',      bar:'#e67e22'},
+    disfigured:{label:'Entstellt',       icon:'🔥',  img:'😨 Bleibende Narben – du hast überlebt!',bar:'#8e44ad'},
+    missing:   {label:'Vermisst',        icon:'🔍',  img:'🗺️ Irgendwo da draußen...',             bar:'#7f8c8d'},
+    dead:      {label:'Tod',             icon:'💀',  img:'⚰️ Game Over. War nett mit dir zu fliegen.',bar:'#e74c3c'},
+  };
+
+  const domInfo=SCENARIOS[dom[0]];
+
+  // Tips
+  const tips=buildTips(r,S);
+
+  const body=document.getElementById('modalBody');
+  body.innerHTML=`
+    <div class="verdict-box">
+      <span class="verdict-icon">${domInfo.icon}</span>
+      <div class="verdict-text">Wahrscheinlichstes Ergebnis: ${domInfo.label}</div>
+      <div class="verdict-sub">${domInfo.img}</div>
+    </div>
+
+    <div style="font-family:'Fredoka One',sans-serif;font-size:1rem;margin-bottom:10px">📊 Alle Wahrscheinlichkeiten:</div>
+
+    ${Object.entries(SCENARIOS).map(([k,sc])=>`
+      <div class="scenario-card">
+        <div class="scenario-img">${sc.icon}</div>
+        <div class="scenario-info">
+          <div class="scenario-label">${sc.label}</div>
+          <div class="scenario-bar-wrap">
+            <div class="scenario-bar" style="background:${sc.bar};width:0%" data-pct="${r[k]}"></div>
+          </div>
+          <div class="scenario-pct" style="color:${sc.bar}">${r[k].toFixed(1)}%</div>
+        </div>
+      </div>
+    `).join('')}
+
+    ${tips.length>0?`
+      <div style="font-family:'Fredoka One',sans-serif;font-size:1rem;margin:16px 0 8px">💡 So erhöhst du deine Chancen:</div>
+      <div class="tip-list">${tips.map(t=>`
+        <div class="tip"><span class="tip-icon">${t.icon}</span><div><b>${t.title}</b>${t.detail}</div></div>
+      `).join('')}</div>
+    `:''}
+
+    <div style="font-size:.72rem;color:#999;margin-top:16px;text-align:center">
+      Basiert auf NTSB/FAA/Boeing-Unfalldaten. Zur Unterhaltung – kein Ersatz für echte Sicherheitsberatung.<br>
+      <a href="impressum.html" style="color:var(--blue)">Impressum & Datenschutz</a>
+    </div>
+
+    <button onclick="document.getElementById('resultOverlay').classList.remove('open')"
+      style="margin-top:14px;width:100%;padding:14px;background:#222;color:#fff;border:none;border-radius:12px;font-family:'Fredoka One',sans-serif;font-size:1.1rem;cursor:pointer">
+      ✈️ Nochmal versuchen
+    </button>
+  `;
+
+  document.getElementById('resultOverlay').classList.add('open');
+
+  // Animate bars
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    body.querySelectorAll('.scenario-bar').forEach(b=>{
+      b.style.width=b.dataset.pct+'%';
+    });
+  }));
+}
+
+function buildTips(r,S){
+  const tips=[];
+  const belt=document.getElementById('beltToggle').checked;
+  const ac=AIRCRAFT[selectedAC];
+
+  if(!belt&&ac.hasBelt)
+    tips.push({icon:'🔒',title:'Anschnallen!',detail:' Ein Sicherheitsgurt erhöht die Überlebenschance um bis zu 30%.'});
+
+  if(selectedTerrain==='water-cold')
+    tips.push({icon:'🧊',title:'Kaltwasser ist lebensgefährlich',detail:' Unter 15°C droht Hypothermie in wenigen Minuten. Wärmeschutz und schnelle Rettung sind entscheidend.'});
+
+  if(r.dead>50)
+    tips.push({icon:'🙏',title:'Vielleicht einfach nicht abstürzen',detail:' Statistisch ist Fliegen das sicherste Verkehrsmittel. Entspann dich.'});
+
+  if(selectedAC==='balloon')
+    tips.push({icon:'🎈',title:'Heißluftballon-Tipp',detail:' Kniebeuge beim Aufprall, Griff am Korb festhalten – reduziert Verletzungen deutlich.'});
+
+  if(selectedAC==='fighter'&&!document.getElementById('ejectToggle').checked)
+    tips.push({icon:'🚀',title:'Schleudersitz nutzen!',detail:' Der Schleudersitz ist dein bester Freund. Aktiviere ihn!'});
+
+  const seat=document.getElementById('seatBtns').querySelector('.seat-btn.active');
+  if(seat&&!seat.querySelector('.safety-good'))
+    tips.push({icon:'💺',title:'Sitzplatz wechseln',detail:' Reihe über der Tragfläche oder ganz hinten sind statistisch am sichersten.'});
+
+  if(r.uninjured>40)
+    tips.push({icon:'🎉',title:'Gute Ausgangslage!',detail:' Deine Wahl der Parameter gibt dir eine realistische Überlebenschance.'});
+
+  return tips;
+}
+</script>
+</body>
+</html>
