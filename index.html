@@ -742,9 +742,8 @@ function calculate(){
   const norm=v=>Math.round((v/total)*1000)/10;
 
   const results={
-    dead:      norm(pDead),
+    dead:      norm(pDead+pDisfigured),
     missing:   norm(pMissing),
-    disfigured:norm(pDisfigured),
     severe:    norm(pSevere),
     uninjured: norm(pLight+pUninjured),
   };
@@ -762,9 +761,8 @@ function renderResults(r,S){
   const SCENARIOS={
     uninjured: {label:'Nicht bis leicht verletzt', icon:'🏃',  img:'🦸 Du kommst raus – vielleicht ein paar Kratzer, aber hey!', bar:'#27ae60'},
     severe:    {label:'Schwer verletzt',            icon:'🚑',  img:'🏥 Intensivstation, aber du lebst!',                         bar:'#e67e22'},
-    disfigured:{label:'Zerfetzt',                   icon:'🔥',  img:'😱 Kaum wiederzuerkennen – aber irgendwie lebst du noch!',   bar:'#8e44ad'},
     missing:   {label:'Vermisst',                   icon:'🔍',  img:'🗺️ Irgendwo da draußen...',                                bar:'#7f8c8d'},
-    dead:      {label:'Tod',                        icon:'💀',  img:'⚰️ Game Over. War nett mit dir zu fliegen.',                bar:'#e74c3c'},
+    dead:      {label:'Tod bis Zerfetzt',           icon:'💀🔥', img:'⚰️ Game Over – entweder tot oder kaum wiederzuerkennen.', bar:'#e74c3c'},
   };
 
   const domInfo=SCENARIOS[dom[0]];
