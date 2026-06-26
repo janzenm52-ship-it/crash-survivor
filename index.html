@@ -306,7 +306,7 @@
       <div class="ac-card" data-ac="helicopter">
         <span class="ac-icon">🚁</span>
         <span class="ac-name">Hubschrauber</span>
-        <span class="ac-ex">Bell, Sikorsky</span>
+        <span class="ac-ex">Zivil & Militär</span>
       </div>
       <div class="ac-card" data-ac="fighter">
         <span class="ac-icon">🛦</span>
@@ -324,24 +324,37 @@
         <span class="ac-ex">Cameron, Kubicek</span>
       </div>
       <div class="ac-card" data-ac="zeppelin">
-        <span class="ac-icon">🛸</span>
+        <span class="ac-icon" style="display:block;margin-bottom:4px">
+          <svg width="48" height="30" viewBox="0 0 48 30" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="22" cy="12" rx="20" ry="9" fill="#d0d0e8" stroke="#333" stroke-width="1.5"/>
+            <polygon points="40,12 47,20 38,17" fill="#a0a0c8" stroke="#333" stroke-width="1"/>
+            <polygon points="40,12 47,4 38,7" fill="#a0a0c8" stroke="#333" stroke-width="1"/>
+            <polygon points="4,12 0,8 6,10" fill="#a0a0c8" stroke="#333" stroke-width="1"/>
+            <rect x="13" y="19" width="14" height="6" rx="2" fill="#f5c842" stroke="#333" stroke-width="1.5"/>
+            <line x1="16" y1="21" x2="15" y2="19" stroke="#333" stroke-width="1"/>
+            <line x1="22" y1="21" x2="22" y2="19" stroke="#333" stroke-width="1"/>
+            <circle cx="17" cy="11" r="2.5" fill="#87ceeb" stroke="#333" stroke-width="1"/>
+            <circle cx="25" cy="11" r="2.5" fill="#87ceeb" stroke="#333" stroke-width="1"/>
+            <text x="9" y="15" font-size="5" fill="#666" font-family="sans-serif">ZEPPELIN</text>
+          </svg>
+        </span>
         <span class="ac-name">Zeppelin</span>
-        <span class="ac-ex">NT, Goodyear</span>
+        <span class="ac-ex">NT, Hindenburg</span>
       </div>
       <div class="ac-card" data-ac="ultralight">
         <span class="ac-icon">🪂</span>
         <span class="ac-name">Ultraleicht</span>
         <span class="ac-ex">Trike, Drachen</span>
       </div>
-      <div class="ac-card" data-ac="mil-heli">
-        <span class="ac-icon">🚁</span>
-        <span class="ac-name">Militär-Heli</span>
-        <span class="ac-ex">Apache, Black Hawk</span>
-      </div>
       <div class="ac-card" data-ac="concorde">
         <span class="ac-icon">🚀</span>
         <span class="ac-name">Überschall</span>
         <span class="ac-ex">Concorde, Tu-144</span>
+      </div>
+      <div class="ac-card" data-ac="ufo-rocket">
+        <span class="ac-icon">🛸</span>
+        <span class="ac-name">UFO / Rakete</span>
+        <span class="ac-ex">Alien, SpaceX 💀</span>
       </div>
     </div>
   </div>
@@ -497,18 +510,18 @@
 // DATA
 // ═══════════════════════════════════════════════
 const AIRCRAFT = {
-  'medium-jet':  {baseSurv:.84,defAlt:10000,hasSeat:true,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.7,landing:.6,ground:.4}},
-  'large-jet':   {baseSurv:.87,defAlt:10500,hasSeat:true,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.7,landing:.6,ground:.35}},
-  'regional':    {baseSurv:.79,defAlt:6500, hasSeat:true,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.75,landing:.65,ground:.45}},
-  'small-plane': {baseSurv:.63,defAlt:1200, hasSeat:false,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.85,landing:.8,ground:.6}},
-  'helicopter':  {baseSurv:.71,defAlt:400,  hasSeat:false,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.9,landing:.85,ground:.7}},
-  'fighter':     {baseSurv:.48,defAlt:9000, hasSeat:false,hasBelt:true,hasEject:true, phases:{cruise:1,takeoff:.8,landing:.75,ground:.6}},
-  'glider':      {baseSurv:.76,defAlt:1000, hasSeat:false,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.9,landing:.82,ground:.65}},
-  'balloon':     {baseSurv:.58,defAlt:700,  hasSeat:false,hasBelt:false,hasEject:false,phases:{cruise:1,takeoff:.9,landing:.75,ground:.85}},
-  'zeppelin':    {baseSurv:.61,defAlt:400,  hasSeat:true, hasBelt:false,hasEject:false,phases:{cruise:1,takeoff:.9,landing:.8,ground:.75}},
-  'ultralight':  {baseSurv:.57,defAlt:250,  hasSeat:false,hasBelt:false,hasEject:false,phases:{cruise:1,takeoff:.85,landing:.8,ground:.7}},
-  'mil-heli':    {baseSurv:.51,defAlt:500,  hasSeat:false,hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.85,landing:.8,ground:.7}},
-  'concorde':    {baseSurv:.41,defAlt:18000,hasSeat:true, hasBelt:true,hasEject:false,phases:{cruise:1,takeoff:.6,landing:.55,ground:.4}},
+  'medium-jet':  {baseSurv:.62,defAlt:10000,hasSeat:true, hasBelt:true, hasEject:false,phases:{cruise:1,takeoff:.62,landing:.55,ground:.38}},
+  'large-jet':   {baseSurv:.65,defAlt:10500,hasSeat:true, hasBelt:true, hasEject:false,phases:{cruise:1,takeoff:.62,landing:.55,ground:.32}},
+  'regional':    {baseSurv:.54,defAlt:6500, hasSeat:true, hasBelt:true, hasEject:false,phases:{cruise:1,takeoff:.65,landing:.58,ground:.42}},
+  'small-plane': {baseSurv:.41,defAlt:1200, hasSeat:false,hasBelt:true, hasEject:false,phases:{cruise:1,takeoff:.75,landing:.70,ground:.55}},
+  'helicopter':  {baseSurv:.47,defAlt:450,  hasSeat:false,hasBelt:true, hasEject:false,phases:{cruise:1,takeoff:.80,landing:.72,ground:.60}},
+  'fighter':     {baseSurv:.32,defAlt:9000, hasSeat:false,hasBelt:true, hasEject:true, phases:{cruise:1,takeoff:.68,landing:.62,ground:.50}},
+  'glider':      {baseSurv:.53,defAlt:1000, hasSeat:false,hasBelt:true, hasEject:false,phases:{cruise:1,takeoff:.82,landing:.72,ground:.58}},
+  'balloon':     {baseSurv:.38,defAlt:700,  hasSeat:false,hasBelt:false,hasEject:false,phases:{cruise:1,takeoff:.80,landing:.62,ground:.78}},
+  'zeppelin':    {baseSurv:.40,defAlt:400,  hasSeat:true, hasBelt:false,hasEject:false,phases:{cruise:1,takeoff:.80,landing:.68,ground:.68}},
+  'ultralight':  {baseSurv:.35,defAlt:250,  hasSeat:false,hasBelt:false,hasEject:false,phases:{cruise:1,takeoff:.75,landing:.70,ground:.62}},
+  'concorde':    {baseSurv:.22,defAlt:18000,hasSeat:true, hasBelt:true, hasEject:false,phases:{cruise:1,takeoff:.48,landing:.42,ground:.32}},
+  'ufo-rocket':  {baseSurv:.04,defAlt:12000,hasSeat:false,hasBelt:false,hasEject:false,phases:{cruise:1,takeoff:.50,landing:.20,ground:.10}},
 };
 
 const SEATS_COMMERCIAL = [
@@ -528,15 +541,15 @@ const SEATS_SMALL = [
 ];
 
 const TERRAIN_MOD = {
-  'runway':     1.55,
-  'flat-land':  1.15,
-  'forest':     0.88,
-  'water-warm': 0.82,
-  'water-cold': 0.62,
-  'mountain':   0.58,
-  'urban':      0.72,
-  'desert':     0.85,
-  'jungle':     0.70,
+  'runway':     1.25,
+  'flat-land':  0.95,
+  'forest':     0.72,
+  'water-warm': 0.65,
+  'water-cold': 0.45,
+  'mountain':   0.40,
+  'urban':      0.55,
+  'desert':     0.68,
+  'jungle':     0.52,
 };
 
 const TERRAIN_MISSING = {
@@ -608,8 +621,8 @@ function updateForAircraft(){
 
   if(ac.hasSeat){
     seatSection.style.display='';
-    renderSeats(selectedAC==='medium-jet'||selectedAC==='large-jet'||selectedAC==='regional'||selectedAC==='zeppelin'||selectedAC==='concorde' ? 'commercial' : 'small');
-  } else if(['small-plane','helicopter','fighter','glider','balloon','ultralight','mil-heli'].includes(selectedAC)){
+    renderSeats(['medium-jet','large-jet','regional','zeppelin','concorde'].includes(selectedAC) ? 'commercial' : 'small');
+  } else if(['small-plane','helicopter','fighter','glider','balloon','ultralight'].includes(selectedAC)){
     seatSection.style.display='';
     renderSeats('small');
   } else {
@@ -714,8 +727,8 @@ function calculate(){
 
   // Survivor injuries depend on crash severity
   const severity=D; // 0=safe, 1=lethal
-  const sevInjRate=0.25+severity*0.45;
-  const lightInjRate=Math.max(0.10,0.35-severity*0.15);
+  const sevInjRate=0.45+severity*0.40;
+  const lightInjRate=Math.max(0.06,0.30-severity*0.18);
   const uninjRate=Math.max(0.01,1-sevInjRate-lightInjRate);
 
   const pSevere=S*sevInjRate;
@@ -749,7 +762,7 @@ function renderResults(r,S){
     uninjured: {label:'Unverletzt',      icon:'🏃',  img:'🦸 Du kommst raus wie ein Action-Held!', bar:'#27ae60'},
     light:     {label:'Leicht verletzt', icon:'🤕',  img:'🩹 Kratzer und Beulen – wird schon!',    bar:'#f39c12'},
     severe:    {label:'Schwer verletzt', icon:'🚑',  img:'🏥 Intensivstation, aber du lebst!',      bar:'#e67e22'},
-    disfigured:{label:'Entstellt',       icon:'🔥',  img:'😨 Bleibende Narben – du hast überlebt!',bar:'#8e44ad'},
+    disfigured:{label:'Zerfetzt',         icon:'🔥',  img:'😱 Kaum wiederzuerkennen – aber irgendwie lebst du noch!',bar:'#8e44ad'},
     missing:   {label:'Vermisst',        icon:'🔍',  img:'🗺️ Irgendwo da draußen...',             bar:'#7f8c8d'},
     dead:      {label:'Tod',             icon:'💀',  img:'⚰️ Game Over. War nett mit dir zu fliegen.',bar:'#e74c3c'},
   };
