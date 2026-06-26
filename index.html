@@ -409,14 +409,14 @@
     <div class="terrain-grid" id="terrainGrid">
       <div class="terrain-btn active" data-terrain="runway"><span class="terrain-icon">🛤️</span><span class="terrain-name">Startbahn</span></div>
       <div class="terrain-btn" data-terrain="flat-land"><span class="terrain-icon">🌾</span><span class="terrain-name">Flaches Land</span></div>
-      <div class="terrain-btn" data-terrain="forest"><span class="terrain-icon">🌲</span><span class="terrain-name">Wald</span></div>
+      <div class="terrain-btn" data-terrain="forest"><span class="terrain-icon">🌲</span><span class="terrain-name">Wald / Dschungel</span></div>
       <div class="terrain-btn" data-terrain="water-warm"><span class="terrain-icon">🌊</span><span class="terrain-name">Meer (warm)</span></div>
       <div class="terrain-btn" data-terrain="water-cold"><span class="terrain-icon">🧊</span><span class="terrain-name">Meer (kalt)</span></div>
       <div class="terrain-btn" data-terrain="mountain"><span class="terrain-icon">⛰️</span><span class="terrain-name">Gebirge</span></div>
       <div class="terrain-btn" data-terrain="urban"><span class="terrain-icon">🏙️</span><span class="terrain-name">Stadt</span></div>
       <div class="terrain-btn" data-terrain="desert"><span class="terrain-icon">🏜️</span><span class="terrain-name">Wüste</span></div>
-      <div class="terrain-btn" data-terrain="jungle"><span class="terrain-icon">🌴</span><span class="terrain-name">Dschungel</span></div>
       <div class="terrain-btn" data-terrain="snowfield"><span class="terrain-icon">🌨️</span><span class="terrain-name">Schneewüste</span></div>
+      <div class="terrain-btn" data-terrain="bermuda"><span class="terrain-icon">🌀</span><span class="terrain-name">Bermudadreieck</span></div>
     </div>
   </div>
 
@@ -550,13 +550,13 @@ const TERRAIN_MOD = {
   'mountain':   0.40,
   'urban':      0.55,
   'desert':     0.68,
-  'jungle':     0.52,
   'snowfield':  0.48,
+  'bermuda':    0.10,
 };
 
 const TERRAIN_MISSING = {
   'runway':0.01,'flat-land':0.03,'forest':0.08,'water-warm':0.20,
-  'water-cold':0.30,'mountain':0.15,'urban':0.03,'desert':0.12,'jungle':0.18,'snowfield':0.22
+  'water-cold':0.30,'mountain':0.15,'urban':0.03,'desert':0.12,'snowfield':0.22,'bermuda':1.0
 };
 
 // ═══════════════════════════════════════════════
@@ -675,6 +675,12 @@ function calculate(){
   const swim=document.getElementById('swimToggle').checked;
   const train=document.getElementById('trainToggle').checked;
   const group=document.getElementById('groupToggle').checked;
+
+  // Bermuda-Sonderfall
+  if(selectedTerrain==='bermuda'){
+    renderResults({uninjured:0,severe:0,dead:0,missing:100},0);
+    return;
+  }
 
   // Base survival
   let S=ac.baseSurv;
